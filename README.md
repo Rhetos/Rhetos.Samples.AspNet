@@ -12,7 +12,7 @@ Complete source code for this example is available at: https://github.com/sstubl
 
 3. Configure `.csproj`
 
-Prevent rhetos auto deploy:
+Prevent Rhetos auto deploy:
 Add `<RhetosDeploy>False</RhetosDeploy>` to `<PropertyGroup>` tag.
 
 Add packages:
@@ -54,9 +54,7 @@ Run `dotnet build` to verify that everything compiles. **Your DSL model from new
 
 ## Connecting to ASP.NET pipeline
 
-Let's wire up Rhetos and ASP.NET dependency injection.
-
-Modify `Startup.cs`, add a static method (this is a useful convention, explained later):
+To wire up Rhetos and ASP.NET dependency injection, modify `Startup.cs`, add a static method (this is a useful convention, explained later):
 
 ```
 using Rhetos;
@@ -292,4 +290,4 @@ services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBui
 
 This addition maps all generated Rhetos API controllers to an existing Swagger document named 'v1'.
 
-Run `dotnet run` and navigate to `http://localhost:5000/swagger/index.html`. You should see entire Rhetos REST API in interactive UI.
+Run `dotnet run Environment=Development` and navigate to `http://localhost:5000/swagger/index.html`. You should see entire Rhetos REST API in interactive UI.
