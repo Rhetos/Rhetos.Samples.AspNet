@@ -13,9 +13,9 @@ Contents:
 5. [Inject Rhetos components into ASP.NET controllers](#inject-rhetos-components-into-aspnet-controllers)
    1. [Executing Rhetos commands](#executing-rhetos-commands)
 6. [Additional integration/extension options](#additional-integrationextension-options)
-   1. [Adding ASP.NET authentication and connecting it to Rhetos](#adding-aspnet-authentication-and-connecting-it-to-rhetos)
-   2. [Adding Rhetos.RestGenerator](#adding-rhetosrestgenerator)
-   3. [View Rhetos.RestGenerator endpoints in Swagger](#view-rhetosrestgenerator-endpoints-in-swagger)
+   1. [Adding Rhetos.RestGenerator](#adding-rhetosrestgenerator)
+   2. [View Rhetos.RestGenerator endpoints in Swagger](#view-rhetosrestgenerator-endpoints-in-swagger)
+   3. [Adding ASP.NET authentication and connecting it to Rhetos](#adding-aspnet-authentication-and-connecting-it-to-rhetos)
 
 ## Setting up
 
@@ -195,6 +195,50 @@ Run the example and navigate to `http://localhost:5000/Rhetos/ReadBooks`. You sh
 
 ## Additional integration/extension options
 
+### Adding Rhetos.RestGenerator
+
+Rhetos.RestGenerator package automatically maps all Rhetos datastructures to REST endpoints.
+
+Add package to `.csproj` file:
+
+```xml
+<PackageReference Include="Rhetos.RestGenerator" Version="5.0.0-dev*" />
+```
+
+Modify lines which add Rhetos in `Startup.cs`, method `ConfigureServices` to read:
+
+```cs
+services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBuilder, configuration))
+    .UseAspNetCoreIdentityUser()
+    .AddRestApi(o => o.BaseRoute = "rest");
+```
+
+If you have not configured authentication yet, enable "AllClaimsForAnonymous" configuration option (see the example in section above).
+
+Run `dotnet run`. REST API is now available. Navigate to `http://localhost:5000/rest/Bookstore/Book` to issue a GET and retrieve all Book entity records in the database.
+
+For more info on usage and serialization configuration see [Rhetos.RestGenerator](https://github.com/Rhetos/RestGenerator)
+
+### View Rhetos.RestGenerator endpoints in Swagger
+
+Since Swagger is already added to webapi project template, we can generate Open API specification for mapped Rhetos endpoints.
+
+Modify lines which add Rhetos in `Startup.cs`, method `ConfigureServices` to read:
+
+```cs
+services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBuilder, Configuration))
+    .UseAspNetCoreIdentityUser()
+    .AddRestApi(o => 
+    {
+        o.BaseRoute = "rest";
+        o.GroupNameMapper = (conceptInfo, name) => "v1";
+    });
+```
+
+This addition maps all generated Rhetos API controllers to an existing Swagger document named 'v1'.
+
+Run `dotnet run Environment=Development` and navigate to `http://localhost:5000/swagger/index.html`. You should see entire Rhetos REST API in interactive UI.
+
 ### Adding ASP.NET authentication and connecting it to Rhetos
 
 **In this example we will use the simplest possible authentication method, although ANY authentication method supported by ASP.NET may be used. For example [Configure Windows Authentication](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/windowsauth?view=aspnetcore-5.0&tabs=visual-studio)**
@@ -268,47 +312,3 @@ Add to `appsettings.json`:
 `http://localhost:5000/Rhetos/ReadBooks` should now correctly return `0` as we haven't added any `Book` entities.
 
 You can write additional controllers/actions and invoke Rhetos commands now.
-
-### Adding Rhetos.RestGenerator
-
-Rhetos.RestGenerator package automatically maps all Rhetos datastructures to REST endpoints.
-
-Add package to `.csproj` file:
-
-```xml
-<PackageReference Include="Rhetos.RestGenerator" Version="5.0.0-dev*" />
-```
-
-Modify lines which add Rhetos in `Startup.cs`, method `ConfigureServices` to read:
-
-```cs
-services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBuilder, configuration))
-    .UseAspNetCoreIdentityUser()
-    .AddRestApi(o => o.BaseRoute = "rest");
-```
-
-If you have not configured authentication yet, enable "AllClaimsForAnonymous" configuration option (see the example in section above).
-
-Run `dotnet run`. REST API is now available. Navigate to `http://localhost:5000/rest/Bookstore/Book` to issue a GET and retrieve all Book entity records in the database.
-
-For more info on usage and serialization configuration see [Rhetos.RestGenerator](https://github.com/Rhetos/RestGenerator)
-
-### View Rhetos.RestGenerator endpoints in Swagger
-
-Since Swagger is already added to webapi project template, we can generate Open API specification for mapped Rhetos endpoints.
-
-Modify lines which add Rhetos in `Startup.cs`, method `ConfigureServices` to read:
-
-```cs
-services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBuilder, Configuration))
-    .UseAspNetCoreIdentityUser()
-    .AddRestApi(o => 
-    {
-        o.BaseRoute = "rest";
-        o.GroupNameMapper = (conceptInfo, name) => "v1";
-    });
-```
-
-This addition maps all generated Rhetos API controllers to an existing Swagger document named 'v1'.
-
-Run `dotnet run Environment=Development` and navigate to `http://localhost:5000/swagger/index.html`. You should see entire Rhetos REST API in interactive UI.
