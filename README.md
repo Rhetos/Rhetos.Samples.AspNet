@@ -10,7 +10,7 @@ Contents:
 2. [Build your first Rhetos App](#build-your-first-rhetos-app)
 3. [Connecting to ASP.NET pipeline](#connecting-to-aspnet-pipeline)
 4. [Applying Rhetos model to database](#applying-rhetos-model-to-database)
-5. [Inject Rhetos components into ASP.NET controllers](#inject-rhetos-components-into-aspnet-controllers)
+5. [Use Rhetos components in ASP.NET controllers](#use-rhetos-components-in-aspnet-controllers)
    1. [Executing Rhetos commands](#executing-rhetos-commands)
 6. [Additional integration/extension options](#additional-integrationextension-options)
    1. [Adding Rhetos.RestGenerator](#adding-rhetosrestgenerator)
@@ -127,7 +127,7 @@ Run `dotnet build`
 
 Run `./rhetos.exe dbupdate Rhetos.Samples.AspNet.dll` in the binary output folder. This runs database update operation in the context of specified host DLL (in our case, our sample application).
 
-## Inject Rhetos components into ASP.NET controllers
+## Use Rhetos components in ASP.NET controllers
 
 This example shows how to use Rhetos components when developing a custom controller.
 
