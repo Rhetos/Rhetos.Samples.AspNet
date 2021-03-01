@@ -6,16 +6,22 @@ Complete source code for this example is available at: https://github.com/sstubl
 
 Contents:
 
-1. [Setting up](#setting-up)
-2. [Build your first Rhetos App](#build-your-first-rhetos-app)
-3. [Connecting to ASP.NET pipeline](#connecting-to-aspnet-pipeline)
-4. [Applying Rhetos model to database](#applying-rhetos-model-to-database)
-5. [Use Rhetos components in ASP.NET controllers](#use-rhetos-components-in-aspnet-controllers)
+1. [Prerequisites](#prerequisites)
+2. [Setting up](#setting-up)
+3. [Build your first Rhetos App](#build-your-first-rhetos-app)
+4. [Connecting to ASP.NET pipeline](#connecting-to-aspnet-pipeline)
+5. [Applying Rhetos model to database](#applying-rhetos-model-to-database)
+6. [Use Rhetos components in ASP.NET controllers](#use-rhetos-components-in-aspnet-controllers)
    1. [Executing Rhetos commands](#executing-rhetos-commands)
-6. [Additional integration/extension options](#additional-integrationextension-options)
+7. [Additional integration/extension options](#additional-integrationextension-options)
    1. [Adding Rhetos.RestGenerator](#adding-rhetosrestgenerator)
    2. [View Rhetos.RestGenerator endpoints in Swagger](#view-rhetosrestgenerator-endpoints-in-swagger)
    3. [Adding ASP.NET authentication and connecting it to Rhetos](#adding-aspnet-authentication-and-connecting-it-to-rhetos)
+
+## Prerequisites
+
+1. Run `dotnet --version` to check if you have **.NET 5 SDK** installed. It should output 5.x.x.
+   If not, install the latest version from <https://dotnet.microsoft.com/download/dotnet/5.0>.
 
 ## Setting up
 
