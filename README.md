@@ -2,7 +2,7 @@
 
 Sample app on how to add Rhetos to ASP.NET Web API project.
 
-Complete source code for this example is available at: https://github.com/sstublic/Rhetos.Samples.AspNet
+Complete source code for this example is available at: <https://github.com/Rhetos/Rhetos.Samples.AspNet>
 
 Contents:
 
@@ -203,7 +203,7 @@ Run the example and navigate to `http://localhost:5000/Rhetos/ReadBooks`. You sh
 
 ### Adding Rhetos.RestGenerator
 
-Rhetos.RestGenerator package automatically maps all Rhetos datastructures to REST endpoints.
+Rhetos.RestGenerator package automatically maps all Rhetos data structures to REST endpoints.
 
 Add package to `.csproj` file:
 
