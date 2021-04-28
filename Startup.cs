@@ -69,6 +69,8 @@ namespace Rhetos.Samples.AspNet
 
             app.UseAuthorization();
 
+            app.UseRhetosRestApi();
+
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

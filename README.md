@@ -219,6 +219,12 @@ services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBui
     .AddRestApi(o => o.BaseRoute = "rest");
 ```
 
+Add to `Startup.cs`, method `Configure` **before** line `app.UseEndpoints(...`:
+
+```cs
+app.UseRhetosRestApi();
+```
+
 If you have not configured authentication yet, enable "AllClaimsForAnonymous" configuration option (see the example in section above).
 
 Run `dotnet run`. REST API is now available. Navigate to `http://localhost:5000/rest/Bookstore/Book` to issue a GET and retrieve all Book entity records in the database.
