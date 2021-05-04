@@ -243,7 +243,7 @@ services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBui
     .AddRestApi(o => 
     {
         o.BaseRoute = "rest";
-        o.GroupNameMapper = (conceptInfo, name) => "v1";
+        o.GroupNameMapper = (conceptInfo, controller, oldName) => "v1";
     });
 ```
 

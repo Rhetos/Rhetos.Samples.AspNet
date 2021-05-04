@@ -34,7 +34,7 @@ namespace Rhetos.Samples.AspNet
                 .AddRestApi(o => 
                 {
                     o.BaseRoute = "rest";
-                    o.GroupNameMapper = (conceptInfo, name) => "v1";
+                    o.GroupNameMapper = (conceptInfo, controller, oldName) => "v1";
                 });
 
             services.AddControllers();
