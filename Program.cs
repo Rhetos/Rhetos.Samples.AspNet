@@ -23,16 +23,5 @@ namespace Rhetos.Samples.AspNet
                 {
                     webBuilder.UseStartup<Startup>();
                 });
-
-        public static IRhetosHostBuilder CreateRhetosHostBuilder()
-        {
-            var host = CreateHostBuilder(null).Build();
-            var configuration = host.Services.GetRequiredService<IConfiguration>();
-
-            var rhetosHostBuilder = new RhetosHostBuilder();
-            Startup.ConfigureRhetosHostBuilder(rhetosHostBuilder, configuration);
-
-            return rhetosHostBuilder;
-        }
     }
 }

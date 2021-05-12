@@ -1,15 +1,10 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Rhetos;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -29,8 +24,9 @@ namespace Rhetos.Samples.AspNet
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBuilder, Configuration))
-                .UseAspNetCoreIdentityUser()
+            services.AddRhetosHost(ConfigureRhetosHostBuilder)
+                .AddAspNetCoreIdentityUser()
+                .AddLoggingIntegration()
                 .AddRestApi(o => 
                 {
                     o.BaseRoute = "rest";
@@ -77,11 +73,11 @@ namespace Rhetos.Samples.AspNet
             });
         }
 
-        public static void ConfigureRhetosHostBuilder(IRhetosHostBuilder rhetosHostBuilder, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        public void ConfigureRhetosHostBuilder(IServiceProvider serviceProvider, IRhetosHostBuilder rhetosHostBuilder)
         {
             rhetosHostBuilder
-                .ConfigureRhetosHostDefaults()
-                .ConfigureConfiguration(cfg => cfg.MapNetCoreConfiguration(configuration));
+                .ConfigureRhetosAppDefaults()
+                .ConfigureConfiguration(cfg => cfg.MapNetCoreConfiguration(Configuration));
         }
     }
 }

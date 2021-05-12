@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Rhetos.Host.AspNet;
 using Rhetos.Processing;
 using Rhetos.Processing.DefaultCommands;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Threading.Tasks;
 using System.Security.Claims;
+using Rhetos;
 
 [Route("Rhetos/[action]")]
 public class MyRhetosController : ControllerBase
