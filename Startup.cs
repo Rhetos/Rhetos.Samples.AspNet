@@ -36,6 +36,7 @@ namespace Rhetos.Samples.AspNet
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
+                c.CustomSchemaIds(type => type.ToString()); // Allows multiple entities with the same name in different modules.
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "Rhetos.Samples.AspNet", Version = "v1" });
             });
 
@@ -73,7 +74,7 @@ namespace Rhetos.Samples.AspNet
             });
         }
 
-        public void ConfigureRhetosHostBuilder(IServiceProvider serviceProvider, IRhetosHostBuilder rhetosHostBuilder)
+        private void ConfigureRhetosHostBuilder(IServiceProvider serviceProvider, IRhetosHostBuilder rhetosHostBuilder)
         {
             rhetosHostBuilder
                 .ConfigureRhetosAppDefaults()
