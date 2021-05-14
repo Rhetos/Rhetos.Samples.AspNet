@@ -74,26 +74,26 @@ Run `dotnet build` to verify that everything compiles. **Your DSL model from new
 
 ## Connecting to ASP.NET pipeline
 
-To wire up Rhetos and ASP.NET dependency injection, modify `Startup.cs`, add a static method (this is a useful convention, explained later):
+To wire up Rhetos and ASP.NET dependency injection, modify `Startup.cs`, add a static method (this is a useful convention but it is not required):
 
 ```cs
 using Rhetos;
 ```
 
 ```cs
-public static void ConfigureRhetosHostBuilder(IRhetosHostBuilder rhetosHostBuilder, Microsoft.Extensions.Configuration.IConfiguration configuration)
+private void ConfigureRhetosHostBuilder(IServiceProvider serviceProvider, IRhetosHostBuilder rhetosHostBuilder)
 {
     rhetosHostBuilder
         .ConfigureRhetosHostDefaults()
-        .ConfigureConfiguration(cfg => cfg.MapNetCoreConfiguration(configuration));
+        .ConfigureConfiguration(cfg => cfg.MapNetCoreConfiguration(Configuration));
 }
 ```
 
 And register Rhetos in `ConfigureServices` method:
 
 ```cs
-services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBuilder, Configuration))
-    .UseAspNetCoreIdentityUser();
+services.AddRhetosHost(ConfigureRhetosHostBuilder)
+    .AddAspNetCoreIdentityUser();
 ```
 
 Rhetos needs database to work with, create it and configure connection string in `appsettings.json` file:
@@ -107,27 +107,7 @@ Rhetos needs database to work with, create it and configure connection string in
 ## Applying Rhetos model to database
 
 To apply model to database we need to use `rhetos.exe` CLI tool. CLI tools need to be able to discover host application configuration and setup. We provide that via static method in `Program.cs`.
-Add the following to `Program.cs`
-
-```cs
-using Microsoft.Extensions.DependencyInjection;
-```
-
-```cs
-public static IRhetosHostBuilder CreateRhetosHostBuilder()
-{
-    var host = CreateHostBuilder(null).Build();
-    var configuration = host.Services.GetRequiredService<IConfiguration>();
-
-    var rhetosHostBuilder = new RhetosHostBuilder();
-    Startup.ConfigureRhetosHostBuilder(rhetosHostBuilder, configuration);
-
-    return rhetosHostBuilder;
-}
-```
-
-`rhetos.exe` will discover and use this method by convention to construct a Rhetos host.
-We are reusing `Startup.ConfigureRhetosHostBuilder` so that our Rhetos is configured exactly the same as in runtime.
+`rhetos.exe` will look for the class where the enry point method is located and will look for the method  `public static IHostBuilder CreateHostBuilder(string[] args)` inside that class and use this method to construct a Rhetos host.
 
 Run `dotnet build`
 
@@ -215,7 +195,7 @@ Modify lines which add Rhetos in `Startup.cs`, method `ConfigureServices` to rea
 
 ```cs
 services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBuilder, configuration))
-    .UseAspNetCoreIdentityUser()
+    .AddAspNetCoreIdentityUser()
     .AddRestApi(o => o.BaseRoute = "rest");
 ```
 
@@ -238,8 +218,8 @@ Since Swagger is already added to webapi project template, we can generate Open 
 Modify lines which add Rhetos in `Startup.cs`, method `ConfigureServices` to read:
 
 ```cs
-services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBuilder, Configuration))
-    .UseAspNetCoreIdentityUser()
+services.AddRhetos(ConfigureRhetosHostBuilder)
+    .AddAspNetCoreIdentityUser()
     .AddRestApi(o => 
     {
         o.BaseRoute = "rest";
