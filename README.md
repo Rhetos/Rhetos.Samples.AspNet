@@ -194,7 +194,7 @@ Add package to `.csproj` file:
 Modify lines which add Rhetos in `Startup.cs`, method `ConfigureServices` to read:
 
 ```cs
-services.AddRhetos(rhetosHostBuilder => ConfigureRhetosHostBuilder(rhetosHostBuilder, configuration))
+services.AddRhetosHost(ConfigureRhetosHostBuilder)
     .AddAspNetCoreIdentityUser()
     .AddRestApi(o => o.BaseRoute = "rest");
 ```
@@ -218,7 +218,7 @@ Since Swagger is already added to webapi project template, we can generate Open 
 Modify lines which add Rhetos in `Startup.cs`, method `ConfigureServices` to read:
 
 ```cs
-services.AddRhetos(ConfigureRhetosHostBuilder)
+services.AddRhetosHost(ConfigureRhetosHostBuilder)
     .AddAspNetCoreIdentityUser()
     .AddRestApi(o => 
     {
