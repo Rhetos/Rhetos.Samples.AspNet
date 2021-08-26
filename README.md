@@ -14,9 +14,10 @@ Contents:
 6. [Use Rhetos components in ASP.NET controllers](#use-rhetos-components-in-aspnet-controllers)
    1. [Executing Rhetos commands](#executing-rhetos-commands)
 7. [Additional integration/extension options](#additional-integrationextension-options)
-   1. [Adding Rhetos.RestGenerator](#adding-rhetosrestgenerator)
-   2. [View Rhetos.RestGenerator endpoints in Swagger](#view-rhetosrestgenerator-endpoints-in-swagger)
-   3. [Adding ASP.NET authentication and connecting it to Rhetos](#adding-aspnet-authentication-and-connecting-it-to-rhetos)
+   1. [Adding Rhetos dashboard](#adding-rhetos-dashboard)
+   2. [Adding Rhetos.RestGenerator](#adding-rhetosrestgenerator)
+   3. [View Rhetos.RestGenerator endpoints in Swagger](#view-rhetosrestgenerator-endpoints-in-swagger)
+   4. [Adding ASP.NET authentication and connecting it to Rhetos](#adding-aspnet-authentication-and-connecting-it-to-rhetos)
 
 ## Prerequisites
 
@@ -65,7 +66,6 @@ Module Bookstore
         Logging;
     }
 }
-
 ```
 
 *This sample is in `Rhetos.*` namespace so we need to correct `Host` conflict in `Program.cs` by changing `Host.CreateDefaultBuilder(...` reads `Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(...`.*
@@ -180,6 +180,18 @@ By default, Rhetos permissions will not allow anonymous users to read any data. 
 Run the example and navigate to `http://localhost:5000/Rhetos/ReadBooks`. You should receive a response value `0` indicating there are 0 entries in our book repository.
 
 ## Additional integration/extension options
+
+### Adding Rhetos dashboard
+
+Rhetos dashboard is a standard Rhetos "homepage" that includes basic system information and GUI for some plugins.
+All official features are implemented with standard Rhetos security permissions, so it could be used by end users if needed.
+
+Adding Rhetos dashboard to a Rhetos application:
+
+1. Extend the Rhetos services configuration (at `services.AddRhetosHost`) with
+   the dashboard components: `.AddDashboard()`
+2. Extend the application with new endpoint: in the `Startup.Configure` method call
+   `app.UseEndpoints(endpoints => { endpoints.MapRhetosDashboard(); });`
 
 ### Adding Rhetos.RestGenerator
 
