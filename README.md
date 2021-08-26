@@ -84,7 +84,7 @@ using Rhetos;
 private void ConfigureRhetosHostBuilder(IServiceProvider serviceProvider, IRhetosHostBuilder rhetosHostBuilder)
 {
     rhetosHostBuilder
-        .ConfigureRhetosHostDefaults()
+        .ConfigureRhetosAppDefaults()
         .ConfigureConfiguration(cfg => cfg.MapNetCoreConfiguration(Configuration));
 }
 ```
