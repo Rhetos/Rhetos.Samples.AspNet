@@ -184,7 +184,9 @@ Run the example and navigate to `http://localhost:5000/Rhetos/ReadBooks`. You sh
 ### Adding Rhetos dashboard
 
 Rhetos dashboard is a standard Rhetos "homepage" that includes basic system information and GUI for some plugins.
-All official features are implemented with standard Rhetos security permissions, so it could be used by end users if needed.
+
+It is intended for testing and administration, but it could also be used by end users if needed
+since all official features are implemented with standard Rhetos security permissions.
 
 Adding Rhetos dashboard to a Rhetos application:
 
@@ -192,6 +194,9 @@ Adding Rhetos dashboard to a Rhetos application:
    the dashboard components: `.AddDashboard()`
 2. Extend the application with new endpoint: in the `Startup.Configure` method call
    `app.UseEndpoints(endpoints => { endpoints.MapRhetosDashboard(); });`
+
+To use is simply open `/rhetos` web page in your Rhetos app (route is configurable in `MapRhetosDashboard`),
+for example <http://localhos:5000/rhetos>.
 
 ### Adding Rhetos.RestGenerator
 
