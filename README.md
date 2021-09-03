@@ -69,7 +69,7 @@ Module Bookstore
 }
 ```
 
-*This sample is in `Rhetos.*` namespace so we need to correct `Host` conflict in `Program.cs` by changing `Host.CreateDefaultBuilder(...` reads `Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(...`.*
+*This demo app has namespace `Rhetos.Sample.AspNet` that starts with `Rhetos.`, so we need to correct `Host` conflict in `Program.cs` by changing `Host.CreateDefaultBuilder(...` reads `Microsoft.Extensions.Hosting.Host.CreateDefaultBuilder(...`.*
 
 Run `dotnet build` to verify that everything compiles. **Your DSL model from newly added script will be compiled and Rhetos classes are now available in your project.**
 
