@@ -225,3 +225,6 @@ __pycache__/
 
 # Windows thumbnail cache files
 Thumbs.db
+
+# Rhetos user-specific files
+rhetos-app.local.settings.json

@@ -15,4 +15,10 @@
     <PackageReference Include="Rhetos.RestGenerator" Version="5.0.0-dev*" />
 </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="rhetos-app.local.settings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
