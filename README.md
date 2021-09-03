@@ -18,6 +18,7 @@ Contents:
    2. [Adding Rhetos.RestGenerator](#adding-rhetosrestgenerator)
    3. [View Rhetos.RestGenerator endpoints in Swagger](#view-rhetosrestgenerator-endpoints-in-swagger)
    4. [Adding ASP.NET authentication and connecting it to Rhetos](#adding-aspnet-authentication-and-connecting-it-to-rhetos)
+   5. [Use NLog to write application's system log into a file](#use-nlog-to-write-applications-system-log-into-a-file)
 
 ## Prerequisites
 
@@ -85,6 +86,7 @@ private void ConfigureRhetosHostBuilder(IServiceProvider serviceProvider, IRheto
 {
     rhetosHostBuilder
         .ConfigureRhetosAppDefaults()
+        .UseBuilderLogProviderFromHost(serviceProvider)
         .ConfigureConfiguration(cfg => cfg.MapNetCoreConfiguration(Configuration));
 }
 ```
@@ -93,7 +95,8 @@ And register Rhetos in `ConfigureServices` method:
 
 ```cs
 services.AddRhetosHost(ConfigureRhetosHostBuilder)
-    .AddAspNetCoreIdentityUser();
+    .AddAspNetCoreIdentityUser()
+    .AddHostLogging();
 ```
 
 Rhetos needs database to work with, create it and configure connection string in `appsettings.json` file:
@@ -107,7 +110,7 @@ Rhetos needs database to work with, create it and configure connection string in
 ## Applying Rhetos model to database
 
 To apply model to database we need to use `rhetos.exe` CLI tool. CLI tools need to be able to discover host application configuration and setup. We provide that via static method in `Program.cs`.
-`rhetos.exe` will look for the class where the enry point method is located and will look for the method  `public static IHostBuilder CreateHostBuilder(string[] args)` inside that class and use this method to construct a Rhetos host.
+`rhetos.exe` will look for the class where the entry point method is located and will look for the method  `public static IHostBuilder CreateHostBuilder(string[] args)` inside that class and use this method to construct a Rhetos host.
 
 Run `dotnet build`
 
@@ -312,7 +315,7 @@ Add to `appsettings.json`:
 ```json
 "Rhetos": {
   "AppSecurity": {
-    "AllClaimsForUsers": "SampleUser@<YOURMACHINENAME>"
+    "AllClaimsForUsers": "SampleUser"
   }
 }
 ```
@@ -320,3 +323,44 @@ Add to `appsettings.json`:
 `http://localhost:5000/Rhetos/ReadBooks` should now correctly return `0` as we haven't added any `Book` entities.
 
 You can write additional controllers/actions and invoke Rhetos commands now.
+
+### Use NLog to write application's system log into a file
+
+1. In Program.cs add `using NLog.Web;`
+2. In `Program.CreateHostBuilder` method add `hostBuilder.UseNLog();`
+3. To configure NLog add the `nlog.config` file to the project.
+   Make sure that the file properties are set to Copy to Output Directory: Copy if newer.
+   To make logging compatible with Rhetos v3 and v4, enter the following text into the file.
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<!-- THis configuration file is used by NLog to setup the logging if the hostBuilder.UseNLog() method is called inside the Program.CreateHostBuilder method-->
+<nlog throwConfigExceptions="true" xmlns="http://www.nlog-project.org/schemas/NLog.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <targets>
+    <target name="MainLog" xsi:type="File" fileName="${basedir}\Logs\RhetosServer.log" encoding="utf-8" archiveFileName="${basedir}\Logs\Archives\RhetosServer {#####}.zip" enableArchiveFileCompression="true" archiveAboveSize="2000000" archiveNumbering="DateAndSequence" />
+    <target name="ConsoleLog" xsi:type="Console" />
+    <target name="TraceLog" xsi:type="AsyncWrapper" overflowAction="Block">
+      <target name="TraceLogBase" xsi:type="File" fileName="${basedir}\Logs\RhetosServerTrace.log" encoding="utf-8" archiveFileName="${basedir}\Logs\Archives\RhetosServerTrace {#####}.zip" enableArchiveFileCompression="true" archiveAboveSize="10000000" archiveNumbering="DateAndSequence" />
+    </target>
+    <target name="TraceCommandsXml" xsi:type="AsyncWrapper" overflowAction="Block">
+      <target name="TraceCommandsXmlBase" xsi:type="File" fileName="${basedir}\Logs\RhetosServerCommandsTrace.xml" encoding="utf-16" layout="&lt;!--${longdate} ${logger}--&gt;${newline}${message}" archiveFileName="${basedir}\Logs\Archives\RhetosServerCommandsTrace {#####}.zip" enableArchiveFileCompression="true" archiveAboveSize="10000000" archiveNumbering="DateAndSequence" />
+    </target>
+    <target name="PerformanceLog" xsi:type="AsyncWrapper" overflowAction="Block">
+      <target name="PerformanceLogBase" xsi:type="File" fileName="${basedir}\Logs\RhetosServerPerformance.log" encoding="utf-8" archiveFileName="${basedir}\Logs\Archives\RhetosServerPerformance {#####}.zip" enableArchiveFileCompression="true" archiveAboveSize="10000000" archiveNumbering="DateAndSequence" />
+    </target>
+  </targets>
+  <rules>
+    <logger name="*" minLevel="Info" writeTo="MainLog" />
+    <!-- <logger name="*" minLevel="Info" writeTo="ConsoleLog" /> -->
+    <!-- <logger name="*" minLevel="Trace" writeTo="TraceLog" /> -->
+    <!-- <logger name="ProcessingEngine Request" minLevel="Trace" writeTo="ConsoleLog" /> -->
+    <!-- <logger name="ProcessingEngine Request" minLevel="Trace" writeTo="TraceLog" /> -->
+    <!-- <logger name="ProcessingEngine Commands" minLevel="Trace" writeTo="TraceCommandsXml" /> -->
+    <!-- <logger name="ProcessingEngine CommandsResult" minLevel="Trace" writeTo="TraceCommandsXml" /> -->
+    <!-- <logger name="ProcessingEngine CommandsWithClientError" minLevel="Trace" writeTo="TraceCommandsXml" /> -->
+    <logger name="ProcessingEngine CommandsWithServerError" minLevel="Trace" writeTo="TraceCommandsXml" />
+    <!-- <logger name="ProcessingEngine CommandsWithServerError" minLevel="Trace" writeTo="MainLog" /> -->
+    <!-- <logger name="Performance*" minLevel="Trace" writeTo="PerformanceLog" /> -->
+  </rules>
+</nlog>
+```

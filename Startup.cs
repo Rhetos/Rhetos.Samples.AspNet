@@ -26,7 +26,8 @@ namespace Rhetos.Samples.AspNet
         {
             services.AddRhetosHost(ConfigureRhetosHostBuilder)
                 .AddAspNetCoreIdentityUser()
-                .AddLoggingIntegration()
+                .AddHostLogging()
+                .AddDashboard()
                 .AddRestApi(o => 
                 {
                     o.BaseRoute = "rest";
@@ -71,6 +72,7 @@ namespace Rhetos.Samples.AspNet
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapRhetosDashboard();
             });
         }
 
@@ -78,7 +80,10 @@ namespace Rhetos.Samples.AspNet
         {
             rhetosHostBuilder
                 .ConfigureRhetosAppDefaults()
-                .ConfigureConfiguration(cfg => cfg.MapNetCoreConfiguration(Configuration));
+                .UseBuilderLogProviderFromHost(serviceProvider)
+                .ConfigureConfiguration(cfg => cfg
+                    .MapNetCoreConfiguration(Configuration)
+                    .AddJsonFile("rhetos-app.local.settings.json", optional: true)); // The "local" file is intended for developer-specific and machine-specific database connection string, and other test settings.
         }
     }
 }
