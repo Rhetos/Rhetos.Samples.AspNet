@@ -250,6 +250,8 @@ This addition maps all generated Rhetos API controllers to an existing Swagger d
 
 Run `dotnet run Environment=Development` and navigate to `http://localhost:5000/swagger/index.html`. You should see entire Rhetos REST API in interactive UI.
 
+In larger applications, for improved Swagger load time, it is recommended to **split each DSL Module into a separate Swagger document**. See additional instructions in RestGenerator documentation in section [Adding Swagger/OpenAPI](https://github.com/Rhetos/RestGenerator/blob/master/Readme.md#adding-swaggeropenapi).
+
 ### Adding ASP.NET authentication and connecting it to Rhetos
 
 **In this example we will use the simplest possible authentication method, although ANY authentication method supported by ASP.NET may be used. For example [Configure Windows Authentication](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/windowsauth?view=aspnetcore-5.0&tabs=visual-studio)**
