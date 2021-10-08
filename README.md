@@ -330,7 +330,9 @@ You can write additional controllers/actions and invoke Rhetos commands now.
 
 1. In Program.cs add `using NLog.Web;`
 2. In `Program.CreateHostBuilder` method add `hostBuilder.UseNLog();`
-3. To configure NLog add the `nlog.config` file to the project.
+3. In `Startup.ConfigureServices`, at `AddRhetosHost`, add `.AddHostLogging()`
+   (if it's not there already).
+4. To configure NLog add the `nlog.config` file to the project.
    Make sure that the file properties are set to Copy to Output Directory: Copy if newer.
    To make logging compatible with Rhetos v3 and v4, enter the following text into the file.
 
