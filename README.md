@@ -449,4 +449,4 @@ Add localization to your Rhetos app:
                 });
     ```
 
-For example, see [Bookstore.Service](https://github.com/Rhetos/Bookstore/tree/master/src/Bookstore.Service) demo app.
+For example in a demo application, see [Bookstore.Service/Startup.cs](https://github.com/Rhetos/Bookstore/blob/master/src/Bookstore.Service/Startup.cs).
