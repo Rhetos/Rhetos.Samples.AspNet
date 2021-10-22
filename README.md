@@ -388,7 +388,7 @@ support to the Rhetos app:
    This example uses OrchardCore, a 3rd party library recommended by Microsoft,
    see [Configure portable object localization in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/portable-object-localization?view=aspnetcore-5.0)
 
-Instructions:
+Add localization to your Rhetos app:
 
 1. In the `.csproj` file, add the following lines:
 
@@ -401,8 +401,9 @@ Instructions:
       </ItemGroup>
     ```
 
-2. Add file `Localization\hr.po` with translations for language "hr"
-   (see [CultureInfo](https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo) for language codes):
+2. Create file `Localization\hr.po` with translations for language "hr"
+   (see [CultureInfo](https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo) for language codes),
+   with the following content:
 
     ```pot
     msgctxt "Rhetos"
