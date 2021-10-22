@@ -19,6 +19,7 @@ Contents:
    3. [View Rhetos.RestGenerator endpoints in Swagger](#view-rhetosrestgenerator-endpoints-in-swagger)
    4. [Adding ASP.NET authentication and connecting it to Rhetos](#adding-aspnet-authentication-and-connecting-it-to-rhetos)
    5. [Use NLog to write application's system log into a file](#use-nlog-to-write-applications-system-log-into-a-file)
+   6. [Adding localization](#adding-localization)
 
 ## Prerequisites
 
@@ -368,3 +369,83 @@ You can write additional controllers/actions and invoke Rhetos commands now.
   </rules>
 </nlog>
 ```
+
+### Adding localization
+
+Localization provides support for multiple languages, but it can also be very useful even if
+an application uses **only one** language (English, e.g.) to modify the messages
+to match the client requirements.
+
+Localization in Rhetos app is automatically applied on translating the Rhetos response messages
+for end users. For example, a data validation error message (InvalidData), UserException, and other.
+
+The following example adds [GetText / PO](http://en.wikipedia.org/wiki/Gettext) localization
+support to the Rhetos app:
+
+1. Rhetos components are configured to use the host application's localization
+   (standard ASP.NET Core localization) by simply adding `AddHostLocalization()` in Rhetos setup.
+2. Any ASP.NET Core localization plugin can be used.
+   This example uses OrchardCore, a 3rd party library recommended by Microsoft,
+   see [Configure portable object localization in ASP.NET Core](https://docs.microsoft.com/en-us/aspnet/core/fundamentals/portable-object-localization?view=aspnetcore-5.0)
+
+Instructions:
+
+1. In the `.csproj` file, add the following lines:
+
+    ```xml
+      <ItemGroup>
+        <PackageReference Include="OrchardCore.Localization.Core" Version="1.1.0" />
+        <None Update="Localization\hr.po">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+      </ItemGroup>
+    ```
+
+2. Add file `Localization\hr.po` with translations for language "hr"
+   (see [CultureInfo](https://docs.microsoft.com/en-us/dotnet/api/system.globalization.cultureinfo) for language codes):
+
+    ```pot
+    msgctxt "Rhetos"
+    msgid "It is not allowed to enter {0} because the required property {1} is not set."
+    msgstr "Nije dozvoljen unos zapisa {0} jer polje {1} nije zadano."
+    ```
+
+3. In `Startup.cs` file, add the following lines (note that DefaultRequestCulture is set to "hr"):
+
+    ```cs
+    using Microsoft.AspNetCore.Localization;
+    using System.Collections.Generic;
+    using System.Globalization;
+
+    // ... in ConfigureServices method, after services.AddRhetosHost:
+                    .AddHostLocalization()
+
+    // ... in ConfigureServices method:
+                services.AddLocalization()
+                    .AddPortableObjectLocalization(options => options.ResourcesPath = "Localization")
+                    .AddMemoryCache();
+
+    // ... in Configure method:
+                app.UseRequestLocalization(options =>
+                {
+                    var supportedCultures = new List<CultureInfo>
+                    {
+                        new CultureInfo("en"),
+                        new CultureInfo("hr")
+                    };
+
+                    options.DefaultRequestCulture = new RequestCulture("hr");
+                    options.SupportedCultures = supportedCultures;
+                    options.SupportedUICultures = supportedCultures;
+                    options.RequestCultureProviders = new List<IRequestCultureProvider>
+                    {
+                        //The culture will be resolved based on the query parameter.
+                        //For example if we want the validation message to be translated to Croatian
+                        //we can call the POST method rest/Bookstore/Book?culture=hr and insert a json object without the 'Title' property.
+                        //It can be configured so that the culture gets resolved based on cookies or headers.
+                        new QueryStringRequestCultureProvider()
+                    };
+                });
+    ```
+
+For example, see [Bookstore.Service](https://github.com/Rhetos/Bookstore/tree/master/src/Bookstore.Service) demo app.
