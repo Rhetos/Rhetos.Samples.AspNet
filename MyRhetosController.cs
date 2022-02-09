@@ -1,44 +1,46 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Rhetos;
 using Rhetos.Processing;
 using Rhetos.Processing.DefaultCommands;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using System.Threading.Tasks;
 using System.Security.Claims;
-using Rhetos;
+using System.Threading.Tasks;
 
 [Route("Rhetos/[action]")]
 public class MyRhetosController : ControllerBase
 {
-    private readonly IRhetosComponent<IProcessingEngine> rhetosProcessingEngine;
+    private readonly IProcessingEngine processingEngine;
 
     public MyRhetosController(IRhetosComponent<IProcessingEngine> rhetosProcessingEngine)
     {
-        this.rhetosProcessingEngine = rhetosProcessingEngine;
+        processingEngine = rhetosProcessingEngine.Value;
     }
 
     [HttpGet]
     public string HelloRhetos()
     {
-        return rhetosProcessingEngine.Value.ToString();
+        return processingEngine.ToString();
     }
 
     [HttpGet]
     public string ReadBooks()
     {
-        var readCommandInfo = new ReadCommandInfo() { DataSource = "Bookstore.Book", ReadTotalCount = true };
+        var readCommandInfo = new ReadCommandInfo { DataSource = "Bookstore.Book", ReadTotalCount = true };
 
-        var processingResult = rhetosProcessingEngine.Value.Execute(new List<ICommandInfo>() {readCommandInfo});
-        var result = (ReadCommandResult) processingResult.CommandResults.Single().Data.Value;
-        return result.TotalCount.ToString();
+        var result = processingEngine.Execute(readCommandInfo);
+
+        return $"{result.TotalCount} books.";
     }
 
     [HttpGet]
     public async Task Login()
     {
-        var claimsIdentity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, "SampleUser") }, CookieAuthenticationDefaults.AuthenticationScheme);
+        // Singing in as a fixed predefined user, for demo.
+        const string username = "SampleUser";
+        var claimsIdentity = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }, CookieAuthenticationDefaults.AuthenticationScheme);
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(claimsIdentity),
