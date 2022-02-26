@@ -20,6 +20,7 @@ Contents:
    4. [Adding ASP.NET authentication and connecting it to Rhetos](#adding-aspnet-authentication-and-connecting-it-to-rhetos)
    5. [Use NLog to write application's system log into a file](#use-nlog-to-write-applications-system-log-into-a-file)
    6. [Adding localization](#adding-localization)
+   7. [Improve Entity Framework performance](#improve-entity-framework-performance)
 
 ## Prerequisites
 
@@ -450,3 +451,25 @@ Add localization to your Rhetos app:
     ```
 
 For example in a demo application, see [Bookstore.Service/Startup.cs](https://github.com/Rhetos/Bookstore/blob/master/src/Bookstore.Service/Startup.cs).
+
+### Improve Entity Framework performance
+
+Complex applications with large number of entities may experience performance improvement
+if Entity Framework's query cache size is increased from its default value.
+This needs to be configured in App.config, since EF 6 still uses the `ConfigurationManager`
+class to load its configuration.
+
+* Add the App.config file as a plain text file in the project root, with the recommended
+EF configuration settings:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+    <configSections>
+        <section name="entityFramework" type="System.Data.Entity.Internal.ConfigFile.EntityFrameworkSection, EntityFramework" />
+    </configSections>
+    <entityFramework>
+        <queryCache size="10000" cleaningIntervalInSeconds="60" />
+    </entityFramework>
+</configuration>
+```
