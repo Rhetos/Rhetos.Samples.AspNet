@@ -12,7 +12,6 @@ Contents:
 4. [Connecting to ASP.NET pipeline](#connecting-to-aspnet-pipeline)
 5. [Applying Rhetos model to database](#applying-rhetos-model-to-database)
 6. [Use Rhetos components in ASP.NET controllers](#use-rhetos-components-in-aspnet-controllers)
-   1. [Executing Rhetos commands](#executing-rhetos-commands)
 7. [Additional integration/extension options](#additional-integrationextension-options)
    1. [Adding Rhetos dashboard](#adding-rhetos-dashboard)
    2. [Adding Rhetos.RestGenerator](#adding-rhetosrestgenerator)
@@ -122,53 +121,43 @@ Run `./rhetos.exe dbupdate Rhetos.Samples.AspNet.dll` in the binary output folde
 
 This example shows how to use Rhetos components when developing a custom controller.
 
-Add a new controller `MyRhetosController.cs`.
+Add a new controller `DemoController.cs`.
 
 ```cs
 using Microsoft.AspNetCore.Mvc;
-using Rhetos.Host.AspNet;
+using Rhetos;
 using Rhetos.Processing;
+using Rhetos.Processing.DefaultCommands;
 
-[Route("Rhetos/[action]")]
-public class MyRhetosController : ControllerBase
+[Route("Demo/[action]")]
+public class DemoController : ControllerBase
 {
-    private readonly IRhetosComponent<IProcessingEngine> rhetosProcessingEngine;
+    private readonly IProcessingEngine processingEngine;
+    private readonly IUnitOfWork unitOfWork;
 
-    public MyRhetosController(IRhetosComponent<IProcessingEngine> rhetosProcessingEngine)
+    public DemoController(IRhetosComponent<IProcessingEngine> processingEngine, IRhetosComponent<IUnitOfWork> unitOfWork)
     {
-        this.rhetosProcessingEngine = rhetosProcessingEngine;
+        this.processingEngine = processingEngine.Value;
+        this.unitOfWork = unitOfWork.Value;
     }
 
     [HttpGet]
-    public string HelloRhetos()
+    public string ReadBooks()
     {
-        return rhetosProcessingEngine.Value.ToString();
+        var readCommandInfo = new ReadCommandInfo { DataSource = "Bookstore.Book", ReadTotalCount = true };
+        var result = processingEngine.Execute(readCommandInfo);
+        return $"{result.TotalCount} books.";
     }
-}
-```
 
-Run `dotnet run` and browse to `http://localhost:5000/Rhetos/HelloRhetos`. You should see the name of the `ProcessingEngine` type meaning we have successfully resolved it from Rhetos:
-`Rhetos.Processing.ProcessingEngine`.
-
-### Executing Rhetos commands
-
-Add a method to `MyRhetosController.cs` to read our Books entity.
-
-```cs
-using Rhetos.Processing.DefaultCommands;
-using System.Collections.Generic;
-using System.Linq;
-```
-
-```cs
-[HttpGet]
-public string ReadBooks()
-{
-    var readCommandInfo = new ReadCommandInfo() { DataSource = "Bookstore.Book", ReadTotalCount = true };
-
-    var processingResult = rhetosProcessingEngine.Value.Execute(new List<ICommandInfo>() {readCommandInfo});
-    var result = (ReadCommandResult) processingResult.CommandResults.Single().Data.Value;
-    return result.TotalCount.ToString();
+    [HttpGet]
+    public string WriteBook()
+    {
+        var newBook = new Bookstore.Book { Title = "NewBook" };
+        var saveCommandInfo = new SaveEntityCommandInfo { Entity = "Bookstore.Book", DataToInsert = new[] { newBook } };
+        processingEngine.Execute(saveCommandInfo);
+        unitOfWork.CommitAndClose(); // Commits and closes database transaction.
+        return "1 book inserted.";
+    }
 }
 ```
 
@@ -182,7 +171,13 @@ By default, Rhetos permissions will not allow anonymous users to read any data. 
 }
 ```
 
-Run the example and navigate to `http://localhost:5000/Rhetos/ReadBooks`. You should receive a response value `0` indicating there are 0 entries in our book repository.
+Run `dotnet run` and browse to `http://localhost:5000/Demo/ReadBooks`.
+You should receive a response value `0 books.` indicating there are 0 entries in the database.
+
+In `WriteBook` method, `unitOfWork.CommitAndClose()` commits the database transaction
+for the current unit of work (a web request).
+Instead of manually committing the transaction, you can use a ServiceFilter `ApiCommitOnSuccessFilter` from Rhetos.RestGenerator plugin,
+see [example](https://github.com/Rhetos/Bookstore/blob/master/src/Bookstore.Service/Controllers/BookController.cs).
 
 ## Additional integration/extension options
 
@@ -282,7 +277,7 @@ And in `Configure` method after `UseRouting()` add:
 app.UseAuthentication();
 ```
 
-Modify `MyRhetosController.cs`
+Modify `DemoController.cs`
 
 ```cs
 using Microsoft.AspNetCore.Authentication;
@@ -309,7 +304,7 @@ This is simple stub code to sign-in `SampleUser` so we have a valid user to work
 
 In `appsettings.json` set `AllClaimsForAnonymous` to `false`. This disables anonymous workaround we have been using so far.
 
-If you run the app now and navigate to `http://localhost:5000/Rhetos/Login` and then to `http://localhost:5000/Rhetos/ReadBooks`, you will receive an error:
+If you run the app now and navigate to `http://localhost:5000/Demo/Login` and then to `http://localhost:5000/Demo/ReadBooks`, you will receive an error:
 `UserException: Your account 'SampleUser' is not registered in the system. Please contact the system administrator.`
 
 Since 'SampleUser' doesn't exist in Rhetos we will use a simple configuration feature to treat him as admin.
@@ -324,7 +319,7 @@ Add to `appsettings.json`:
 }
 ```
 
-`http://localhost:5000/Rhetos/ReadBooks` should now correctly return `0` as we haven't added any `Book` entities.
+`http://localhost:5000/Demo/ReadBooks` should now correctly return `0` as we haven't added any `Book` entities.
 
 You can write additional controllers/actions and invoke Rhetos commands now.
 
