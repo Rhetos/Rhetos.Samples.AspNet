@@ -41,10 +41,10 @@ Contents:
 
      ```xml
      <ItemGroup>
-       <PackageReference Include="Rhetos.Host" Version="5.0.0-dev*" />
-       <PackageReference Include="Rhetos.Host.AspNet" Version="5.0.0-dev*" />
-       <PackageReference Include="Rhetos.CommonConcepts" Version="5.0.0-dev*" />
-       <PackageReference Include="Rhetos.MSBuild" Version="5.0.0-dev*" />
+       <PackageReference Include="Rhetos.Host" Version="5.0.0" />
+       <PackageReference Include="Rhetos.Host.AspNet" Version="5.0.0" />
+       <PackageReference Include="Rhetos.CommonConcepts" Version="5.0.0" />
+       <PackageReference Include="Rhetos.MSBuild" Version="5.0.0" />
        <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
      </ItemGroup>
      ```
@@ -204,7 +204,7 @@ Rhetos.RestGenerator package automatically maps all Rhetos data structures to RE
 Add package to `.csproj` file:
 
 ```xml
-<PackageReference Include="Rhetos.RestGenerator" Version="5.0.0-dev*" />
+<PackageReference Include="Rhetos.RestGenerator" Version="5.0.0" />
 ```
 
 Modify lines which add Rhetos in `Startup.cs`, method `ConfigureServices` to read:
