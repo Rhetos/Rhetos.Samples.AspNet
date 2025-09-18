@@ -1,1 +1,1 @@
-bin\Debug\net5.0\rhetos.exe dbupdate bin\Debug\net5.0\Rhetos.Samples.AspNet.dll
+bin\Debug\net8.0\rhetos.exe dbupdate bin\Debug\net8.0\Rhetos.Samples.AspNet.dll
