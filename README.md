@@ -325,46 +325,15 @@ You can write additional controllers/actions and invoke Rhetos commands now.
 
 ### Use NLog to write application's system log into a file
 
-1. In Program.cs add `using NLog.Web;`
-2. In `Program.CreateHostBuilder` method add `hostBuilder.UseNLog();`
-3. In `Startup.ConfigureServices`, at `AddRhetosHost`, add `.AddHostLogging()`
-   (if it's not there already).
-4. To configure NLog add the `nlog.config` file to the project.
+1. Add NuGet package `NLog.Web.AspNetCore`, select latest release of 6.x.x.
+2. In Program.cs add `using NLog.Web;`
+3. Add `builder.Logging.ClearProviders(); builder.Host.UseNLog();` immediately after creating the `builder` instance.
+4. Extend the Rhetos services configuration (at `builder.Services.AddRhetosHost`)
+   with `.AddHostLogging()` (if it's not there already).
+5. To configure NLog add the `nlog.config` file to the project.
    Make sure that the file properties are set to Copy to Output Directory: Copy if newer.
-   To make logging compatible with Rhetos v3 and v4, enter the following text into the file.
-
-```xml
-<?xml version="1.0" encoding="utf-8"?>
-<!-- THis configuration file is used by NLog to setup the logging if the hostBuilder.UseNLog() method is called inside the Program.CreateHostBuilder method-->
-<nlog throwConfigExceptions="true" xmlns="http://www.nlog-project.org/schemas/NLog.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <targets>
-    <target name="MainLog" xsi:type="File" fileName="${basedir}\Logs\RhetosServer.log" encoding="utf-8" archiveFileName="${basedir}\Logs\Archives\RhetosServer {#####}.zip" enableArchiveFileCompression="true" archiveAboveSize="2000000" archiveNumbering="DateAndSequence" />
-    <target name="ConsoleLog" xsi:type="Console" />
-    <target name="TraceLog" xsi:type="AsyncWrapper" overflowAction="Block">
-      <target name="TraceLogBase" xsi:type="File" fileName="${basedir}\Logs\RhetosServerTrace.log" encoding="utf-8" archiveFileName="${basedir}\Logs\Archives\RhetosServerTrace {#####}.zip" enableArchiveFileCompression="true" archiveAboveSize="10000000" archiveNumbering="DateAndSequence" />
-    </target>
-    <target name="TraceCommandsXml" xsi:type="AsyncWrapper" overflowAction="Block">
-      <target name="TraceCommandsXmlBase" xsi:type="File" fileName="${basedir}\Logs\RhetosServerCommandsTrace.xml" encoding="utf-16" layout="&lt;!--${longdate} ${logger}--&gt;${newline}${message}" archiveFileName="${basedir}\Logs\Archives\RhetosServerCommandsTrace {#####}.zip" enableArchiveFileCompression="true" archiveAboveSize="10000000" archiveNumbering="DateAndSequence" />
-    </target>
-    <target name="PerformanceLog" xsi:type="AsyncWrapper" overflowAction="Block">
-      <target name="PerformanceLogBase" xsi:type="File" fileName="${basedir}\Logs\RhetosServerPerformance.log" encoding="utf-8" archiveFileName="${basedir}\Logs\Archives\RhetosServerPerformance {#####}.zip" enableArchiveFileCompression="true" archiveAboveSize="10000000" archiveNumbering="DateAndSequence" />
-    </target>
-  </targets>
-  <rules>
-    <logger name="*" minLevel="Info" writeTo="MainLog" />
-    <!-- <logger name="*" minLevel="Info" writeTo="ConsoleLog" /> -->
-    <!-- <logger name="*" minLevel="Trace" writeTo="TraceLog" /> -->
-    <!-- <logger name="ProcessingEngine Request" minLevel="Trace" writeTo="ConsoleLog" /> -->
-    <!-- <logger name="ProcessingEngine Request" minLevel="Trace" writeTo="TraceLog" /> -->
-    <!-- <logger name="ProcessingEngine Commands" minLevel="Trace" writeTo="TraceCommandsXml" /> -->
-    <!-- <logger name="ProcessingEngine CommandsResult" minLevel="Trace" writeTo="TraceCommandsXml" /> -->
-    <!-- <logger name="ProcessingEngine CommandsWithClientError" minLevel="Trace" writeTo="TraceCommandsXml" /> -->
-    <logger name="ProcessingEngine CommandsWithServerError" minLevel="Trace" writeTo="TraceCommandsXml" />
-    <!-- <logger name="ProcessingEngine CommandsWithServerError" minLevel="Trace" writeTo="MainLog" /> -->
-    <!-- <logger name="Performance*" minLevel="Trace" writeTo="PerformanceLog" /> -->
-  </rules>
-</nlog>
-```
+   To make logging compatible with Rhetos v3 and v4, copy the contents of [nlog.config](https://raw.githubusercontent.com/wiki/Rhetos/Rhetos/nlog.config)
+   into your project's nlog.config.
 
 ### Adding localization
 
